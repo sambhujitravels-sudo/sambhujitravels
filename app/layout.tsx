@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: '{{GOOGLE_SITE_VERIFICATION}}',
+    google: 'tpuqYtuF--kSmOKfQmxDsDafhIid_vBM7K0_6Wtw6aI',
   },
   alternates: {
     canonical: 'https://sambhujitravels.in',
