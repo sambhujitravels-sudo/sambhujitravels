@@ -5,8 +5,12 @@ import Footer from '@/components/Footer'
 import BookingForm from '@/components/BookingForm'
 import { BreadcrumbJsonLd, FAQJsonLd } from '@/components/JsonLd'
 import { allRoutes, findRoute, cityToSlug } from '@/lib/routes'
+import { generateDynamicRouteDetails } from '@/lib/routeDetails'
 import Link from 'next/link'
-import { MapPin, Clock, Car, Phone, ArrowRight } from 'lucide-react'
+import { 
+  MapPin, Clock, Car, Phone, ArrowRight, ShieldCheck, 
+  Compass, AlertTriangle, Fuel, Info, CalendarCheck 
+} from 'lucide-react'
 
 // Allow dynamic routes not in generateStaticParams
 export const dynamicParams = true
@@ -15,7 +19,6 @@ type Params = Promise<{ route: string }>
 
 // Parse route like "bareilly-to-nainital-cab" into { from: "bareilly", to: "nainital" }
 function parseRoute(route: string): { from: string; to: string } | null {
-  // Match pattern: {from}-to-{to}-cab
   const match = route.match(/^(.+)-to-(.+)-cab$/)
   if (!match) return null
   return { from: match[1], to: match[2] }
@@ -33,16 +36,17 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const fromCity = from.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
   const toCity = to.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
   const routeData = findRoute(from, to)
+  const details = generateDynamicRouteDetails(from, to, routeData?.distance || 200, routeData?.time || '4-5 hours')
 
   return {
-    title: `${fromCity} to ${toCity} Taxi | Cab Booking from ₹11/km`,
-    description: `Book ${fromCity} to ${toCity} cab at ₹11/km. ${routeData?.distance || 200} km distance, ${routeData?.time || '4-5 hours'}. 24/7 service, AC cabs, verified drivers. Call +91 8077230221.`,
+    title: `${fromCity} to ${toCity} Taxi | Cab Booking starting ₹11/km`,
+    description: `${details.intro.slice(0, 150)}... Book outstation cab from ${fromCity} to ${toCity} at ₹11/km. 24/7 support. Call +91 8077230221.`,
     alternates: {
       canonical: `https://sambhujitravels.in/${from}-to-${to}-cab`,
     },
     openGraph: {
       title: `${fromCity} to ${toCity} Taxi | Shambhu ji Travels`,
-      description: `Book ${fromCity} to ${toCity} cab starting ₹11/km. Sedan, SUV & Innova available. 24/7 booking.`,
+      description: `Premium one-way & round trip taxi service from ${fromCity} to ${toCity}. Sedan, SUV & Innova Crysta.`,
       url: `https://sambhujitravels.in/${from}-to-${to}-cab`,
     },
   }
@@ -68,46 +72,10 @@ export default async function RoutePage({ params }: { params: Params }) {
 
   const routeData = findRoute(from, to)
 
-  // Default data if route not in database
+  // Get dynamic unique details
   const distance = routeData?.distance || 200
   const time = routeData?.time || '4-5 hours'
-  const description = routeData?.description || `Book a reliable taxi from ${fromCity} to ${toCity} with Shambhu ji Travels. We offer comfortable AC cabs with verified drivers for your journey.`
-  const highlights = routeData?.highlights || ['24/7 Service', 'Verified Drivers', 'No Hidden Charges', 'AC Vehicles']
-
-  const faqs = [
-    {
-      question: `What is the taxi fare from ${fromCity} to ${toCity}?`,
-      answer: `The taxi fare from ${fromCity} to ${toCity} depends on the vehicle type. Sedan starts at ₹11/km, SUV at ₹13/km, and Innova Crysta at ₹18/km. The distance is approximately ${distance} km. Contact us at +91 8077230221 for exact fare.`,
-    },
-    {
-      question: `How long does it take to travel from ${fromCity} to ${toCity} by taxi?`,
-      answer: `The journey from ${fromCity} to ${toCity} takes approximately ${time} by car, covering a distance of ${distance} km. Travel time may vary based on traffic and weather conditions.`,
-    },
-    {
-      question: `Do you provide one-way cab from ${fromCity} to ${toCity}?`,
-      answer: `Yes, we provide one-way cab service from ${fromCity} to ${toCity}. You only pay for the one-way distance with no return charges. One-way service starts at ₹11/km for Sedan.`,
-    },
-    {
-      question: `Is round trip available from ${fromCity} to ${toCity}?`,
-      answer: `Yes, round trip is available from ${fromCity} to ${toCity}. For round trips, we offer competitive rates. Contact us for the best package deal.`,
-    },
-    {
-      question: `What types of cars are available for ${fromCity} to ${toCity} trip?`,
-      answer: `We offer Sedan (Swift Dzire) at ₹11/km, SUV (Ertiga) at ₹13/km, and Innova Crysta at ₹18/km. All vehicles are AC and well-maintained with verified drivers.`,
-    },
-    {
-      question: `Can I book a taxi from ${fromCity} to ${toCity} for early morning?`,
-      answer: `Yes, we provide 24/7 taxi service. You can book for any time including early morning, late night, or midnight. Call +91 8077230221 or WhatsApp for booking.`,
-    },
-    {
-      question: `Are toll and parking charges included in the fare?`,
-      answer: `The base fare is calculated per kilometer. Toll taxes, parking charges, and state permits are charged extra as per actuals. We provide all receipts for transparency.`,
-    },
-    {
-      question: `How can I book a taxi from ${fromCity} to ${toCity}?`,
-      answer: `You can book by calling +91 8077230221, sending a WhatsApp message, or using the booking form on this page. We provide instant confirmation.`,
-    },
-  ]
+  const details = generateDynamicRouteDetails(from, to, distance, time)
 
   // Get related routes (same origin, different destination)
   const relatedRoutes = allRoutes
@@ -123,36 +91,48 @@ export default async function RoutePage({ params }: { params: Params }) {
           { name: `${fromCity} to ${toCity} Cab`, url: `https://sambhujitravels.in/${from}-to-${to}-cab` },
         ]}
       />
-      <FAQJsonLd faqs={faqs} />
+      <FAQJsonLd faqs={details.faqs} />
 
       <Header />
-      <main>
+      <main className="bg-gray-50/50">
         {/* Hero Section */}
-        <section className="bg-primary text-white py-12">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center text-sm text-blue-200 mb-4">
-              <Link href="/" className="hover:text-white">Home</Link>
+        <section className="bg-primary text-white py-16 relative overflow-hidden">
+          {/* Subtle Background Pattern */}
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="flex items-center text-sm text-blue-200 mb-4 font-medium">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
               <span className="mx-2">/</span>
-              <span>{fromCity} to {toCity} Cab</span>
+              <span>{fromCity} to {toCity} Taxi</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">
-              {fromCity} to {toCity} Taxi Service
+            <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
+              {fromCity} to {toCity} Cab Service
             </h1>
-            <p className="text-blue-100 text-lg max-w-2xl mb-6">
-              Book reliable cab service from {fromCity} to {toCity}. One-way & round trip available at best prices.
+            <p className="text-blue-100 text-base md:text-lg max-w-3xl mb-8 leading-relaxed">
+              {details.intro}
             </p>
             <div className="flex flex-wrap gap-4">
-              <div className="bg-white/10 backdrop-blur px-4 py-2 rounded-lg flex items-center">
-                <MapPin size={18} className="mr-2 text-accent" />
-                <span>{distance} km</span>
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 px-5 py-3 rounded-xl flex items-center shadow-sm">
+                <MapPin size={20} className="mr-3 text-accent" />
+                <div>
+                  <span className="block text-xs text-blue-200">Distance</span>
+                  <span className="font-bold text-sm md:text-base">{distance} km</span>
+                </div>
               </div>
-              <div className="bg-white/10 backdrop-blur px-4 py-2 rounded-lg flex items-center">
-                <Clock size={18} className="mr-2 text-accent" />
-                <span>{time}</span>
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 px-5 py-3 rounded-xl flex items-center shadow-sm">
+                <Clock size={20} className="mr-3 text-accent" />
+                <div>
+                  <span className="block text-xs text-blue-200">Duration</span>
+                  <span className="font-bold text-sm md:text-base">{time}</span>
+                </div>
               </div>
-              <div className="bg-white/10 backdrop-blur px-4 py-2 rounded-lg flex items-center">
-                <Car size={18} className="mr-2 text-accent" />
-                <span>From ₹11/km</span>
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 px-5 py-3 rounded-xl flex items-center shadow-sm">
+                <Car size={20} className="mr-3 text-accent" />
+                <div>
+                  <span className="block text-xs text-blue-200">Sedan Rate</span>
+                  <span className="font-bold text-sm md:text-base">₹11/km</span>
+                </div>
               </div>
             </div>
           </div>
@@ -164,55 +144,67 @@ export default async function RoutePage({ params }: { params: Params }) {
             <div className="grid lg:grid-cols-3 gap-8 items-start">
               {/* Left Content */}
               <div className="lg:col-span-2 space-y-8 order-2 lg:order-1">
-                {/* Pricing Table */}
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                    {fromCity} to {toCity} Taxi Rates
-                  </h2>
+                
+                {/* Pricing Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-150 p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+                      {fromCity} to {toCity} Fare Details
+                    </h2>
+                    <span className="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-green-200">
+                      Guaranteed Best Price
+                    </span>
+                  </div>
                   
                   {/* Table for Desktop */}
                   <div className="hidden sm:block overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Vehicle</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Capacity</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Rate</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Book</th>
+                        <tr className="border-b border-gray-100">
+                          <th className="text-left py-3 px-4 font-semibold text-gray-600 text-sm">Vehicle Class</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-600 text-sm">Capacity</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-600 text-sm">Rate per KM</th>
+                          <th className="text-right py-3 px-4 font-semibold text-gray-600 text-sm">Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr className="border-b hover:bg-gray-50">
+                        <tr className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
                           <td className="py-4 px-4">
-                            <div className="font-medium">Sedan</div>
-                            <div className="text-sm text-gray-500">Swift Dzire</div>
+                            <div className="font-bold text-gray-800">AC Sedan</div>
+                            <div className="text-xs text-gray-500">Swift Dzire, Etios or similar</div>
                           </td>
-                          <td className="py-4 px-4">4 Passengers</td>
-                          <td className="py-4 px-4 font-bold text-accent">₹11/km</td>
-                          <td className="py-4 px-4">
-                            <a href="tel:+918077230221" className="text-primary hover:text-accent font-medium">Call Now</a>
-                          </td>
-                        </tr>
-                        <tr className="border-b hover:bg-gray-50 bg-blue-50">
-                          <td className="py-4 px-4">
-                            <div className="font-medium">SUV</div>
-                            <div className="text-sm text-gray-500">Ertiga</div>
-                          </td>
-                          <td className="py-4 px-4">6 Passengers</td>
-                          <td className="py-4 px-4 font-bold text-accent">₹13/km</td>
-                          <td className="py-4 px-4">
-                            <a href="tel:+918077230221" className="text-primary hover:text-accent font-medium">Call Now</a>
+                          <td className="py-4 px-4 text-gray-600 text-sm">4 Passengers</td>
+                          <td className="py-4 px-4 font-extrabold text-accent">₹11/km</td>
+                          <td className="py-4 px-4 text-right">
+                            <a href={`https://wa.me/918077230221?text=Hi%2C%20I%20want%20to%20book%20a%20Sedan%20from%20${fromCity}%20to%20${toCity}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center bg-primary text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-accent transition-colors shadow-sm">
+                              Book Dzire
+                            </a>
                           </td>
                         </tr>
-                        <tr className="hover:bg-gray-50">
+                        <tr className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors bg-blue-50/20">
                           <td className="py-4 px-4">
-                            <div className="font-medium">Innova Crysta</div>
-                            <div className="text-sm text-gray-500">Premium SUV</div>
+                            <div className="font-bold text-gray-800">AC SUV</div>
+                            <div className="text-xs text-gray-500">Ertiga, Triber or similar</div>
                           </td>
-                          <td className="py-4 px-4">7 Passengers</td>
-                          <td className="py-4 px-4 font-bold text-accent">₹18/km</td>
+                          <td className="py-4 px-4 text-gray-600 text-sm">6 Passengers</td>
+                          <td className="py-4 px-4 font-extrabold text-accent">₹13/km</td>
+                          <td className="py-4 px-4 text-right">
+                            <a href={`https://wa.me/918077230221?text=Hi%2C%20I%20want%20to%20book%20a%20SUV%20from%20${fromCity}%20to%20${toCity}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center bg-primary text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-accent transition-colors shadow-sm">
+                              Book Ertiga
+                            </a>
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-gray-50/50 transition-colors">
                           <td className="py-4 px-4">
-                            <a href="tel:+918077230221" className="text-primary hover:text-accent font-medium">Call Now</a>
+                            <div className="font-bold text-gray-800">Innova Crysta</div>
+                            <div className="text-xs text-gray-500">Premium Luxury SUV</div>
+                          </td>
+                          <td className="py-4 px-4 text-gray-600 text-sm">7 Passengers</td>
+                          <td className="py-4 px-4 font-extrabold text-accent">₹18/km</td>
+                          <td className="py-4 px-4 text-right">
+                            <a href={`https://wa.me/918077230221?text=Hi%2C%20I%20want%20to%20book%20an%20Innova%20from%20${fromCity}%20to%20${toCity}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center bg-primary text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-accent transition-colors shadow-sm">
+                              Book Innova
+                            </a>
                           </td>
                         </tr>
                       </tbody>
@@ -221,96 +213,201 @@ export default async function RoutePage({ params }: { params: Params }) {
 
                   {/* Card List for Mobile */}
                   <div className="block sm:hidden space-y-4">
-                    {/* Sedan Card */}
-                    <div className="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
-                      <div className="flex justify-between items-center mb-2">
+                    <div className="border border-gray-150 rounded-xl p-4 bg-gray-50/50">
+                      <div className="flex justify-between items-center mb-1">
                         <span className="font-bold text-gray-800 text-sm">Sedan (Swift Dzire)</span>
-                        <span className="bg-accent/15 text-accent font-bold px-2 py-0.5 rounded text-xs">₹11/km</span>
+                        <span className="text-accent font-extrabold text-sm">₹11/km</span>
                       </div>
-                      <div className="text-xs text-gray-500 mb-3">Capacity: 4 Passengers</div>
-                      <a href="tel:+918077230221" className="w-full block text-center bg-primary text-white py-2 rounded-lg font-semibold text-xs hover:bg-accent transition-colors">Book Dzire</a>
+                      <div className="text-xs text-gray-500 mb-3">Capacity: 4 Passengers (AC Cabs)</div>
+                      <a href={`https://wa.me/918077230221?text=Hi%2C%20I%20want%20to%20book%20a%20Sedan%20from%20${fromCity}%20to%20${toCity}`} target="_blank" rel="noopener noreferrer" className="w-full block text-center bg-primary text-white py-2 rounded-lg font-bold text-xs hover:bg-accent transition-colors shadow">Book Dzire</a>
                     </div>
-                    {/* SUV Card */}
-                    <div className="border border-gray-150 rounded-xl p-4 bg-blue-50/30">
-                      <div className="flex justify-between items-center mb-2">
+                    <div className="border border-gray-150 rounded-xl p-4 bg-blue-50/20">
+                      <div className="flex justify-between items-center mb-1">
                         <span className="font-bold text-gray-800 text-sm">SUV (Ertiga)</span>
-                        <span className="bg-accent/15 text-accent font-bold px-2 py-0.5 rounded text-xs">₹13/km</span>
+                        <span className="text-accent font-extrabold text-sm">₹13/km</span>
                       </div>
-                      <div className="text-xs text-gray-500 mb-3">Capacity: 6 Passengers</div>
-                      <a href="tel:+918077230221" className="w-full block text-center bg-primary text-white py-2 rounded-lg font-semibold text-xs hover:bg-accent transition-colors">Book Ertiga</a>
+                      <div className="text-xs text-gray-500 mb-3">Capacity: 6 Passengers (Family Cab)</div>
+                      <a href={`https://wa.me/918077230221?text=Hi%2C%20I%20want%20to%20book%20a%20SUV%20from%20${fromCity}%20to%20${toCity}`} target="_blank" rel="noopener noreferrer" className="w-full block text-center bg-primary text-white py-2 rounded-lg font-bold text-xs hover:bg-accent transition-colors shadow">Book Ertiga</a>
                     </div>
-                    {/* Innova Card */}
-                    <div className="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
-                      <div className="flex justify-between items-center mb-2">
+                    <div className="border border-gray-150 rounded-xl p-4 bg-gray-50/50">
+                      <div className="flex justify-between items-center mb-1">
                         <span className="font-bold text-gray-800 text-sm">Innova Crysta</span>
-                        <span className="bg-accent/15 text-accent font-bold px-2 py-0.5 rounded text-xs">₹18/km</span>
+                        <span className="text-accent font-extrabold text-sm">₹18/km</span>
                       </div>
-                      <div className="text-xs text-gray-500 mb-3">Capacity: 7 Passengers (Premium)</div>
-                      <a href="tel:+918077230221" className="w-full block text-center bg-primary text-white py-2 rounded-lg font-semibold text-xs hover:bg-accent transition-colors">Book Innova</a>
+                      <div className="text-xs text-gray-500 mb-3">Capacity: 7 Passengers (Premium Seat)</div>
+                      <a href={`https://wa.me/918077230221?text=Hi%2C%20I%20want%20to%20book%20an%20Innova%20from%20${fromCity}%20to%20${toCity}`} target="_blank" rel="noopener noreferrer" className="w-full block text-center bg-primary text-white py-2 rounded-lg font-bold text-xs hover:bg-accent transition-colors shadow">Book Innova</a>
                     </div>
                   </div>
 
-                  <p className="text-sm text-gray-500 mt-4">
-                    * Toll taxes, parking, and state permits charged extra as per actuals
+                  <p className="text-xs text-gray-400 mt-4 leading-normal">
+                    * Rates exclude state border permits, highway toll plazas, and parking fees, which are billed on actual receipts. We do not apply flat toll commissions.
                   </p>
                 </div>
 
-                {/* Description */}
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                    About {fromCity} to {toCity} Route
-                  </h2>
-                  <p className="text-gray-600 mb-6">{description}</p>
+                {/* Travel Advisory Guide */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-150 p-6 space-y-6">
+                  <div>
+                    <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 flex items-center">
+                      <Compass className="text-primary mr-2" size={22} />
+                      Route Driving Advisory
+                    </h3>
+                    <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+                      {details.travelGuide}
+                    </p>
+                  </div>
 
-                  <h3 className="text-lg font-bold text-gray-800 mb-3">Why Choose Us</h3>
-                  <ul className="grid md:grid-cols-2 gap-3">
-                    {highlights.map((highlight, index) => (
-                      <li key={index} className="flex items-center text-gray-700">
-                        <svg className="w-5 h-5 text-accent mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        {highlight}
-                      </li>
-                    ))}
-                  </ul>
+                  {/* Advisory Notice Box */}
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start space-x-3">
+                    <AlertTriangle className="text-amber-600 shrink-0 mt-0.5" size={18} />
+                    <div className="text-xs md:text-sm text-amber-800">
+                      <strong className="block font-semibold mb-0.5">Safety Precaution:</strong>
+                      Always coordinate with your driver prior to departure regarding any customized route deviations. All our drivers are GPS monitored.
+                    </div>
+                  </div>
                 </div>
 
-                {/* FAQ Section */}
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                    Frequently Asked Questions
+                {/* Best Stopovers / Pitstops */}
+                {details.bestStops && details.bestStops.length > 0 && (
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-150 p-6">
+                    <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-6 flex items-center">
+                      <MapPin className="text-primary mr-2" size={22} />
+                      Recommended Food & Rest Stops
+                    </h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {details.bestStops.map((stop, index) => (
+                        <div key={index} className="border border-gray-100 rounded-xl p-4 bg-gray-50 hover:bg-white hover:shadow-md transition-all duration-300">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                              {index + 1}
+                            </span>
+                            <span className="font-bold text-gray-800 text-sm md:text-base">{stop.name}</span>
+                          </div>
+                          <p className="text-gray-600 text-xs md:text-sm leading-relaxed pl-8">
+                            {stop.description}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Highway Details (Road, Toll, Fuel) */}
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-150 p-5 flex flex-col justify-between">
+                    <div>
+                      <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-primary mb-4">
+                        <Car size={20} />
+                      </div>
+                      <h4 className="font-bold text-gray-800 text-sm mb-2">Road Conditions</h4>
+                      <p className="text-gray-500 text-xs leading-relaxed">
+                        {details.roadCondition}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-150 p-5 flex flex-col justify-between">
+                    <div>
+                      <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center text-green-600 mb-4">
+                        <Info size={20} />
+                      </div>
+                      <h4 className="font-bold text-gray-800 text-sm mb-2">Tolls & Permits</h4>
+                      <p className="text-gray-500 text-xs leading-relaxed">
+                        {details.tollInfo}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-150 p-5 flex flex-col justify-between">
+                    <div>
+                      <div className="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600 mb-4">
+                        <Fuel size={20} />
+                      </div>
+                      <h4 className="font-bold text-gray-800 text-sm mb-2">Refueling & CNG</h4>
+                      <p className="text-gray-500 text-xs leading-relaxed">
+                        {details.fuelPoints}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tourist Attractions & Seasons */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-150 p-6 grid md:grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="text-base md:text-lg font-bold text-gray-800 mb-4 flex items-center">
+                      <Compass className="text-primary mr-2" size={18} />
+                      Attractions in {toCity}
+                    </h3>
+                    <ul className="space-y-2">
+                      {details.touristPlaces.map((place, idx) => (
+                        <li key={idx} className="flex items-center text-gray-700 text-sm">
+                          <span className="w-1.5 h-1.5 rounded-full bg-accent mr-2 shrink-0"></span>
+                          {place}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="border-t md:border-t-0 md:border-l border-gray-100 pt-6 md:pt-0 md:pl-8">
+                    <h3 className="text-base md:text-lg font-bold text-gray-800 mb-4 flex items-center">
+                      <CalendarCheck className="text-primary mr-2" size={18} />
+                      Best Season & Weather
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="text-sm text-gray-700">
+                        <strong className="block text-gray-800 font-semibold mb-0.5">Peak Travel Time:</strong>
+                        {details.bestTravelTime}
+                      </div>
+                      <div className="text-sm text-gray-700">
+                        <strong className="block text-gray-800 font-semibold mb-0.5">Seasonal Notes:</strong>
+                        {details.seasonalNotes}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dynamic FAQ Accordion */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-150 p-6">
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6">
+                    {fromCity} to {toCity} Cab FAQs
                   </h2>
                   <div className="space-y-4">
-                    {faqs.map((faq, index) => (
-                      <details key={index} className="bg-gray-50 rounded-lg border border-gray-200 group">
-                        <summary className="flex items-center justify-between p-4 cursor-pointer font-medium text-gray-800 hover:text-primary transition-colors">
+                    {details.faqs.map((faq, index) => (
+                      <details key={index} className="bg-gray-50 rounded-xl border border-gray-150 group">
+                        <summary className="flex items-center justify-between p-4 cursor-pointer font-bold text-gray-800 hover:text-primary transition-colors text-sm md:text-base select-none">
                           {faq.question}
                           <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </summary>
-                        <div className="px-4 pb-4 text-gray-600">{faq.answer}</div>
+                        <div className="px-4 pb-4 text-gray-600 text-xs md:text-sm leading-relaxed border-t border-gray-100 pt-3">
+                          {faq.answer}
+                        </div>
                       </details>
                     ))}
                   </div>
                 </div>
+
               </div>
 
               {/* Right Sidebar */}
               <div className="space-y-6 order-1 lg:order-2">
-                {/* Booking Form */}
                 <div className="sticky top-24">
-                  <BookingForm />
+                  {/* Booking Widget Container */}
+                  <div className="relative">
+                    <BookingForm />
+                  </div>
 
-                  {/* Quick Call */}
-                  <div className="mt-6 bg-primary text-white p-6 rounded-xl text-center">
-                    <h3 className="font-bold mb-2">Need Help Booking?</h3>
-                    <p className="text-blue-200 text-sm mb-4">Call us for instant booking</p>
+                  {/* Quick Booking Credential */}
+                  <div className="mt-6 bg-primary text-white p-6 rounded-2xl text-center shadow-lg relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full transform translate-x-8 -translate-y-8"></div>
+                    <ShieldCheck className="mx-auto text-accent mb-3" size={32} />
+                    <h3 className="font-bold text-lg mb-1">Need Booking Support?</h3>
+                    <p className="text-blue-200 text-xs mb-4">We are online 24/7. Response in 2 minutes.</p>
                     <a
                       href="tel:+918077230221"
-                      className="flex items-center justify-center bg-accent hover:bg-green-600 text-white py-3 px-6 rounded-lg font-bold transition-colors"
+                      className="flex items-center justify-center bg-accent hover:bg-green-600 text-white py-3 px-6 rounded-xl font-bold transition-all shadow-md text-sm"
                     >
-                      <Phone size={20} className="mr-2" />
+                      <Phone size={18} className="mr-2" />
                       +91 8077230221
                     </a>
                   </div>
@@ -322,25 +419,30 @@ export default async function RoutePage({ params }: { params: Params }) {
 
         {/* Related Routes */}
         {relatedRoutes.length > 0 && (
-          <section className="py-12 bg-gray-50">
+          <section className="py-16 bg-gray-100/50 border-t border-gray-200">
             <div className="container mx-auto px-4">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Other Routes from {fromCity}</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">Popular Travel Routes from {fromCity}</h2>
               <div className="grid grid-cols-1 min-[450px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {relatedRoutes.map((route, index) => (
                   <Link
                     key={index}
                     href={`/${cityToSlug(route.from)}-to-${cityToSlug(route.to)}-cab`}
-                    className="bg-white rounded-lg p-4 shadow-sm hover:shadow-lg transition-all border border-gray-200 hover:border-accent group"
+                    className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md hover:border-accent transition-all border border-gray-200 group flex flex-col justify-between"
                   >
-                    <div className="flex items-center justify-between mb-1 text-xs text-gray-500">
-                      <span>{route.from}</span>
-                      <ArrowRight size={12} />
-                      <span>{route.to}</span>
+                    <div>
+                      <div className="flex items-center justify-between mb-2 text-[10px] uppercase font-bold tracking-wider text-gray-400">
+                        <span>{route.from}</span>
+                        <ArrowRight size={10} className="text-accent" />
+                        <span>{route.to}</span>
+                      </div>
+                      <div className="font-bold text-gray-800 group-hover:text-primary transition-colors text-sm">
+                        {route.from} to {route.to}
+                      </div>
                     </div>
-                    <div className="font-medium text-gray-800 group-hover:text-primary transition-colors text-sm">
-                      {route.from} to {route.to}
+                    <div className="flex justify-between items-center mt-3 pt-2 border-t border-gray-50">
+                      <span className="text-[11px] font-semibold text-gray-500">{route.distance} km</span>
+                      <span className="text-accent font-extrabold text-[11px]">₹11/km</span>
                     </div>
-                    <div className="text-accent font-bold text-sm mt-1">{route.distance} km</div>
                   </Link>
                 ))}
               </div>
@@ -352,3 +454,4 @@ export default async function RoutePage({ params }: { params: Params }) {
     </>
   )
 }
+

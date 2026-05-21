@@ -170,9 +170,17 @@ export default function BookingForm() {
         </button>
       </form>
 
-      <p className="text-xs text-gray-400 text-center mt-3">
-        Free cancellation · Instant confirmation
-      </p>
+      <div className="mt-4 pt-3 border-t border-gray-100 space-y-1.5 text-center text-xs">
+        <p className="font-bold text-primary flex items-center justify-center">
+          ⚡ Book in 30 Seconds — No Advance Payment Needed
+        </p>
+        <p className="text-gray-500">
+          Driver details shared 3 hours before the trip
+        </p>
+        <p className="text-[10px] text-gray-400">
+          Free cancellation • 24/7 Booking Support
+        </p>
+      </div>
     </div>
   )
 }

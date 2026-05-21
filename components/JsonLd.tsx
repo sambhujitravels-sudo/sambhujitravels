@@ -6,11 +6,20 @@ export function JsonLd() {
     name: 'Shambhu ji Travels',
     description: 'Reliable taxi and cab service in Bareilly offering one-way, round trip, and airport transfers across North India.',
     url: 'https://sambhujitravels.in',
+    logo: 'https://sambhujitravels.in/logo.png',
     telephone: '+918077230221',
     email: 'sambhujitravels@gmail.com',
     priceRange: '₹₹',
     currenciesAccepted: 'INR',
     paymentAccepted: 'Cash, UPI, Card',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '123, Main Market, Civil Lines',
+      addressLocality: 'Bareilly',
+      addressRegion: 'Uttar Pradesh',
+      postalCode: '243001',
+      addressCountry: 'IN'
+    },
     areaServed: [
       { '@type': 'City', name: 'Bareilly' },
       { '@type': 'State', name: 'Uttar Pradesh' },
@@ -21,6 +30,13 @@ export function JsonLd() {
       '@type': 'GeoCoordinates',
       latitude: '28.3670',
       longitude: '79.4304',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      reviewCount: '129',
+      bestRating: '5',
+      worstRating: '1'
     },
     openingHoursSpecification: {
       '@type': 'OpeningHoursSpecification',
@@ -41,6 +57,20 @@ export function JsonLd() {
       '@type': 'LocalBusiness',
       name: 'Shambhu ji Travels',
       telephone: '+918077230221',
+      logo: 'https://sambhujitravels.in/logo.png',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: '123, Main Market, Civil Lines',
+        addressLocality: 'Bareilly',
+        addressRegion: 'Uttar Pradesh',
+        postalCode: '243001',
+        addressCountry: 'IN'
+      }
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      reviewCount: '129'
     },
     areaServed: {
       '@type': 'State',

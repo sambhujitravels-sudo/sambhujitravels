@@ -1,4 +1,5 @@
 import { ShieldCheck, Clock, Wallet, HeadphonesIcon, Car, MapPin } from 'lucide-react'
+import Image from 'next/image'
 
 const features = [
   {
@@ -95,6 +96,80 @@ export default function WhyChooseUs() {
             <div>
               <span className="block text-4xl font-bold text-accent">24/7</span>
               <span className="text-blue-200 text-sm">Customer Support</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Verified Fleet & Professional Drivers Showcase */}
+        <div className="mt-16 border-t border-gray-100 pt-16">
+          <div className="text-center mb-10">
+            <span className="bg-primary/5 text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+              Our Professional Standards
+            </span>
+            <h3 className="text-2xl font-bold text-gray-800 mt-2 mb-3">
+              Verified Taxis & Uniformed Drivers
+            </h3>
+            <p className="text-gray-600 max-w-xl mx-auto text-sm">
+              We operate a modern, clean, RTO-registered fleet driven by vetted and background-checked chauffeurs.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* Fleet card */}
+            <div className="bg-gray-50 border border-gray-150 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="relative h-56 w-full">
+                <Image
+                  src="/taxi_fleet.png"
+                  alt="Shambhu Ji Travels Taxi Fleet"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-5">
+                <h4 className="font-bold text-gray-800 text-lg mb-1.5">Government Registered Fleet</h4>
+                <p className="text-gray-600 text-xs leading-relaxed">
+                  All cabs carry commercial yellow plates, valid tourist permits, speed governors, and standard commercial auto insurance (RTO UP registered).
+                </p>
+              </div>
+            </div>
+
+            {/* Driver card */}
+            <div className="bg-gray-50 border border-gray-150 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="relative h-56 w-full">
+                <Image
+                  src="/driver_uniform.png"
+                  alt="Our Uniformed Professional Driver"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-5">
+                <h4 className="font-bold text-gray-800 text-lg mb-1.5">Verified Uniformed Chauffeurs</h4>
+                <p className="text-gray-600 text-xs leading-relaxed">
+                  Our drivers wear smart uniforms, carry valid commercial driving licenses, and undergo strict background checks for safe outstation driving.
+                </p>
+              </div>
+            </div>
+
+            {/* Tourist card */}
+            <div className="bg-gray-50 border border-gray-150 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="relative h-56 w-full">
+                <Image
+                  src="/tourist_trip.png"
+                  alt="Happy Tourists Outstation Trip"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-5">
+                <h4 className="font-bold text-gray-800 text-lg mb-1.5">Memorable Journeys</h4>
+                <p className="text-gray-600 text-xs leading-relaxed">
+                  From hill station curves to high-speed expressways, we have completed over 15,000+ safe trips for tourists and business travelers alike.
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -94,9 +94,41 @@ export default function Testimonials({ initialReviews }: { initialReviews?: Revi
           <h2 className="text-3xl font-extrabold mb-4 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
             What Our Customers Say
           </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto text-sm">
+          <p className="text-gray-400 max-w-2xl mx-auto text-sm mb-8">
             Read real stories from travelers who experienced the convenience and reliability of Shambhu ji Travels.
           </p>
+
+          {/* Google Place Summary Card */}
+          <div className="max-w-md mx-auto bg-gray-800/80 border border-gray-700/60 p-5 rounded-2xl shadow-xl flex items-center justify-between gap-6 mb-8 text-left hover:border-blue-500/30 transition-all">
+            <div className="flex items-center gap-3">
+              <div className="bg-white p-2.5 rounded-xl flex items-center justify-center shadow-inner">
+                <GoogleIcon className="w-8 h-8" />
+              </div>
+              <div>
+                <h3 className="font-bold text-base text-white">Shambhu Ji Travels</h3>
+                <p className="text-xs text-gray-400">Govt. Registered Taxi Service</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-[11px] font-semibold text-gray-300">Google Business Page</span>
+                  <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.25 rounded-md font-bold text-[9px] select-none">Verified</span>
+                </div>
+              </div>
+            </div>
+            <div className="text-right border-l border-gray-700/60 pl-6 shrink-0">
+              <div className="flex items-center justify-end text-yellow-400 font-extrabold text-lg gap-1">
+                <span>4.9</span>
+                <span className="flex text-sm">{'★'.repeat(5)}</span>
+              </div>
+              <p className="text-xs text-gray-400 mt-0.5">129+ Verified Reviews</p>
+              <a 
+                href="https://maps.google.com/?cid=12643566589326466986"
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-block text-[11px] text-accent font-bold hover:underline mt-1"
+              >
+                Verify on Google Maps →
+              </a>
+            </div>
+          </div>
         </div>
 
         {displayedReviews.length === 0 ? (
