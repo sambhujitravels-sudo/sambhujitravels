@@ -1,5 +1,8 @@
+'use client'
+
 import { Phone, Mail } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import AllRoutes from './AllRoutes'
 
 const popularRoutes = [
@@ -14,6 +17,15 @@ const popularRoutes = [
 ]
 
 export default function Footer() {
+  const pathname = usePathname()
+
+  const handleScrollToTop = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (pathname === href) {
+      e.preventDefault()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
   return (
     <>
       {/* All Routes Section */}
@@ -45,11 +57,12 @@ export default function Footer() {
           <div>
             <h3 className="text-xl font-bold text-white mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/" className="hover:text-accent transition-colors">Home</Link></li>
-              <li><Link href="/about" className="hover:text-accent transition-colors">About Us</Link></li>
-              <li><Link href="/services" className="hover:text-accent transition-colors">Services</Link></li>
-              <li><Link href="/blog" className="hover:text-accent transition-colors">Travel Guide</Link></li>
-              <li><Link href="/contact" className="hover:text-accent transition-colors">Contact Us</Link></li>
+              <li><Link href="/" onClick={(e) => handleScrollToTop(e, '/')} className="hover:text-accent transition-colors">Home</Link></li>
+              <li><Link href="/about" onClick={(e) => handleScrollToTop(e, '/about')} className="hover:text-accent transition-colors">About Us</Link></li>
+              <li><Link href="/services" onClick={(e) => handleScrollToTop(e, '/services')} className="hover:text-accent transition-colors">Services</Link></li>
+              <li><Link href="/reviews" onClick={(e) => handleScrollToTop(e, '/reviews')} className="hover:text-accent transition-colors">Reviews & Testimonials</Link></li>
+              <li><Link href="/blog" onClick={(e) => handleScrollToTop(e, '/blog')} className="hover:text-accent transition-colors">Travel Guide</Link></li>
+              <li><Link href="/contact" onClick={(e) => handleScrollToTop(e, '/contact')} className="hover:text-accent transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 

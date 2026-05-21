@@ -161,15 +161,17 @@ export default async function RoutePage({ params }: { params: Params }) {
         {/* Main Content */}
         <section className="py-12">
           <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className="grid lg:grid-cols-3 gap-8 items-start">
               {/* Left Content */}
-              <div className="lg:col-span-2 space-y-8">
+              <div className="lg:col-span-2 space-y-8 order-2 lg:order-1">
                 {/* Pricing Table */}
                 <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
                   <h2 className="text-2xl font-bold text-gray-800 mb-6">
                     {fromCity} to {toCity} Taxi Rates
                   </h2>
-                  <div className="overflow-x-auto">
+                  
+                  {/* Table for Desktop */}
+                  <div className="hidden sm:block overflow-x-auto">
                     <table className="w-full">
                       <thead>
                         <tr className="border-b">
@@ -216,6 +218,38 @@ export default async function RoutePage({ params }: { params: Params }) {
                       </tbody>
                     </table>
                   </div>
+
+                  {/* Card List for Mobile */}
+                  <div className="block sm:hidden space-y-4">
+                    {/* Sedan Card */}
+                    <div className="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-bold text-gray-800 text-sm">Sedan (Swift Dzire)</span>
+                        <span className="bg-accent/15 text-accent font-bold px-2 py-0.5 rounded text-xs">₹11/km</span>
+                      </div>
+                      <div className="text-xs text-gray-500 mb-3">Capacity: 4 Passengers</div>
+                      <a href="tel:+918077230221" className="w-full block text-center bg-primary text-white py-2 rounded-lg font-semibold text-xs hover:bg-accent transition-colors">Book Dzire</a>
+                    </div>
+                    {/* SUV Card */}
+                    <div className="border border-gray-150 rounded-xl p-4 bg-blue-50/30">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-bold text-gray-800 text-sm">SUV (Ertiga)</span>
+                        <span className="bg-accent/15 text-accent font-bold px-2 py-0.5 rounded text-xs">₹13/km</span>
+                      </div>
+                      <div className="text-xs text-gray-500 mb-3">Capacity: 6 Passengers</div>
+                      <a href="tel:+918077230221" className="w-full block text-center bg-primary text-white py-2 rounded-lg font-semibold text-xs hover:bg-accent transition-colors">Book Ertiga</a>
+                    </div>
+                    {/* Innova Card */}
+                    <div className="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-bold text-gray-800 text-sm">Innova Crysta</span>
+                        <span className="bg-accent/15 text-accent font-bold px-2 py-0.5 rounded text-xs">₹18/km</span>
+                      </div>
+                      <div className="text-xs text-gray-500 mb-3">Capacity: 7 Passengers (Premium)</div>
+                      <a href="tel:+918077230221" className="w-full block text-center bg-primary text-white py-2 rounded-lg font-semibold text-xs hover:bg-accent transition-colors">Book Innova</a>
+                    </div>
+                  </div>
+
                   <p className="text-sm text-gray-500 mt-4">
                     * Toll taxes, parking, and state permits charged extra as per actuals
                   </p>
@@ -263,7 +297,7 @@ export default async function RoutePage({ params }: { params: Params }) {
               </div>
 
               {/* Right Sidebar */}
-              <div className="space-y-6">
+              <div className="space-y-6 order-1 lg:order-2">
                 {/* Booking Form */}
                 <div className="sticky top-24">
                   <BookingForm />
@@ -291,7 +325,7 @@ export default async function RoutePage({ params }: { params: Params }) {
           <section className="py-12 bg-gray-50">
             <div className="container mx-auto px-4">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">Other Routes from {fromCity}</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="grid grid-cols-1 min-[450px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {relatedRoutes.map((route, index) => (
                   <Link
                     key={index}

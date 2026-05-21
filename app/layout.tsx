@@ -66,8 +66,8 @@ export default function RootLayout({
   return (
     <html lang="en-IN">
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" href="/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
         <JsonLd />
       </head>
       <body>
