@@ -3,44 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Star, Quote, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
-
-interface Review {
-  id: string
-  name: string
-  rating: number
-  comment: string
-  trip: string
-  date: string
-  source?: string
-  avatarUrl?: string
-}
-
-const DEFAULT_REVIEWS: Review[] = [
-  {
-    id: '1',
-    name: 'Rohan Sharma',
-    rating: 5,
-    comment: 'Excellent service from Bareilly to Delhi. The driver was very polite, prompt, and the Swift Dzire cab was spotless. Highly recommended!',
-    trip: 'Bareilly to Delhi',
-    date: '2026-05-18',
-  },
-  {
-    id: '2',
-    name: 'Amit Patel',
-    rating: 5,
-    comment: 'Booked an Ertiga SUV for our family trip to Nainital. Very comfortable ride, the driver was experienced in hill driving, and pricing was completely transparent.',
-    trip: 'Bareilly to Nainital',
-    date: '2026-05-14',
-  },
-  {
-    id: '3',
-    name: 'Priya Verma',
-    rating: 4,
-    comment: 'Regular customer of Shambhu ji Travels. The WhatsApp booking is incredibly fast and response time is instant. Reliable 24/7 service.',
-    trip: 'Lucknow to Bareilly',
-    date: '2026-05-09',
-  }
-]
+import { type Review, DEFAULT_REVIEWS } from '@/lib/reviews'
 
 const GoogleIcon = ({ className = "w-3 h-3" }: { className?: string }) => (
   <svg className={`${className} shrink-0`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -51,18 +14,26 @@ const GoogleIcon = ({ className = "w-3 h-3" }: { className?: string }) => (
   </svg>
 )
 
-export default function Testimonials() {
-  const [reviews, setReviews] = useState<Review[]>([])
+export default function Testimonials({ initialReviews }: { initialReviews?: Review[] }) {
+  const [reviews, setReviews] = useState<Review[]>(initialReviews || [])
 
   const loadReviews = () => {
     const savedCombined = localStorage.getItem('shambhuji_reviews_combined')
     if (savedCombined) {
       try {
-        setReviews(JSON.parse(savedCombined))
-        return
+        const parsed = JSON.parse(savedCombined)
+        if (parsed && parsed.length > 0) {
+          setReviews(parsed)
+          return
+        }
       } catch (e) {
-        // Fall back to standard saved reviews
+        // Fall back
       }
+    }
+
+    if (initialReviews && initialReviews.length > 0) {
+      setReviews(initialReviews)
+      return
     }
 
     const saved = localStorage.getItem('shambhuji_reviews')
@@ -78,14 +49,40 @@ export default function Testimonials() {
   }
 
   useEffect(() => {
-    loadReviews()
+    if (!initialReviews || initialReviews.length === 0) {
+      // Client-side fallback fetch
+      fetch('/api/google-reviews')
+        .then(res => res.json())
+        .then(data => {
+          if (data.reviews && data.reviews.length > 0) {
+            let locals = DEFAULT_REVIEWS
+            const saved = localStorage.getItem('shambhuji_reviews')
+            if (saved) {
+              try { locals = JSON.parse(saved) } catch (e) {}
+            }
+            const combined = [...locals, ...data.reviews].sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            )
+            localStorage.setItem('shambhuji_reviews_combined', JSON.stringify(combined))
+            setReviews(combined)
+          } else {
+            loadReviews()
+          }
+        })
+        .catch(() => {
+          loadReviews()
+        })
+    } else {
+      localStorage.removeItem('shambhuji_reviews_combined')
+      loadReviews()
+    }
 
-    // Listen to changes in localStorage
+    // Listen to changes in localStorage (e.g. from the reviews page)
     window.addEventListener('reviewsUpdated', loadReviews)
     return () => {
       window.removeEventListener('reviewsUpdated', loadReviews)
     }
-  }, [])
+  }, [initialReviews])
 
   // Show top 3 reviews
   const displayedReviews = reviews.slice(0, 3)
@@ -144,7 +141,7 @@ export default function Testimonials() {
                         {review.source === 'google' && (
                           <span className="inline-flex items-center bg-blue-500/10 text-[9px] text-blue-400 px-1.5 py-0.5 rounded-full font-bold border border-blue-500/20 gap-0.5 select-none">
                             <GoogleIcon />
-                            <span>Verified</span>
+                            <span>Google Verified User</span>
                           </span>
                         )}
                       </div>

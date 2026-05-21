@@ -6,6 +6,7 @@ import Testimonials from '@/components/Testimonials'
 import PopularDestinations from '@/components/PopularDestinations'
 import Footer from '@/components/Footer'
 import { FAQJsonLd } from '@/components/JsonLd'
+import { getCombinedReviews } from '@/lib/reviews'
 
 const homeFAQs = [
   {
@@ -42,7 +43,10 @@ const homeFAQs = [
   },
 ]
 
-export default function Home() {
+export default async function Home() {
+  const reviewsData = await getCombinedReviews()
+  const reviews = reviewsData.reviews
+
   return (
     <>
       <FAQJsonLd faqs={homeFAQs} />
@@ -52,7 +56,7 @@ export default function Home() {
         <Services />
         <WhyChooseUs />
         <PopularDestinations />
-        <Testimonials />
+        <Testimonials initialReviews={reviews} />
 
         {/* FAQ Section */}
         <section className="py-16 bg-white">

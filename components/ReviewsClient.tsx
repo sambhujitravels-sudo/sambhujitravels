@@ -2,52 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Star, ShieldCheck, Clock, Award, Users, Heart, RefreshCw } from 'lucide-react'
-
-interface Review {
-  id: string
-  name: string
-  rating: number
-  comment: string
-  trip: string
-  date: string
-  source?: string
-  avatarUrl?: string
-}
-
-const DEFAULT_REVIEWS: Review[] = [
-  {
-    id: '1',
-    name: 'Rohan Sharma',
-    rating: 5,
-    comment: 'Excellent service from Bareilly to Delhi. The driver was very polite, prompt, and the Swift Dzire cab was spotless. Highly recommended!',
-    trip: 'Bareilly to Delhi',
-    date: '2026-05-18',
-  },
-  {
-    id: '2',
-    name: 'Amit Patel',
-    rating: 5,
-    comment: 'Booked an Ertiga SUV for our family trip to Nainital. Very comfortable ride, the driver was experienced in hill driving, and pricing was completely transparent.',
-    trip: 'Bareilly to Nainital',
-    date: '2026-05-14',
-  },
-  {
-    id: '3',
-    name: 'Priya Verma',
-    rating: 4,
-    comment: 'Regular customer of Shambhu ji Travels. The WhatsApp booking is incredibly fast and response time is instant. Reliable 24/7 service.',
-    trip: 'Lucknow to Bareilly',
-    date: '2026-05-09',
-  },
-  {
-    id: '4',
-    name: 'Vikram Singh',
-    rating: 5,
-    comment: 'Very professional airport transfer to Delhi IGI airport. Clean vehicle, timely arrival at 3 AM. Truly premium taxi service.',
-    trip: 'Bareilly to Delhi Airport',
-    date: '2026-05-01',
-  }
-]
+import { type Review, DEFAULT_REVIEWS } from '@/lib/reviews'
 
 // Google Brand Color G Icon SVG
 const GoogleIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
@@ -59,12 +14,27 @@ const GoogleIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   </svg>
 )
 
-export default function ReviewsClient() {
-  const [localReviews, setLocalReviews] = useState<Review[]>([])
-  const [googleReviews, setGoogleReviews] = useState<Review[]>([])
-  const [reviews, setReviews] = useState<Review[]>([])
+interface ReviewsClientProps {
+  initialReviews?: Review[]
+  initialGoogleRating?: number
+  initialGoogleReviewsCount?: number
+}
+
+export default function ReviewsClient({
+  initialReviews,
+  initialGoogleRating,
+  initialGoogleReviewsCount
+}: ReviewsClientProps) {
+  const [localReviews, setLocalReviews] = useState<Review[]>(DEFAULT_REVIEWS)
+  const [googleReviews, setGoogleReviews] = useState<Review[]>(
+    initialReviews ? initialReviews.filter(r => r.source === 'google') : []
+  )
+  const [reviews, setReviews] = useState<Review[]>(initialReviews || [])
   const [ratingFilter, setRatingFilter] = useState<number | null>(null)
-  const [googleStats, setGoogleStats] = useState({ rating: '4.9', totalCount: 124 })
+  const [googleStats, setGoogleStats] = useState({
+    rating: initialGoogleRating?.toString() || '4.9',
+    totalCount: initialGoogleReviewsCount || 129
+  })
   const [isSyncing, setIsSyncing] = useState(false)
   const [lastSynced, setLastSynced] = useState<string>('')
 
@@ -85,9 +55,15 @@ export default function ReviewsClient() {
     }
     setLocalReviews(locals)
 
-    // 2. Fetch Google Reviews
-    fetchGoogleReviews(locals)
-  }, [])
+    // 2. Fetch Google Reviews if not provided initially
+    if (!initialReviews || initialReviews.length === 0) {
+      fetchGoogleReviews(locals)
+    } else {
+      localStorage.removeItem('shambhuji_reviews_combined')
+      setReviews(initialReviews)
+      setGoogleReviews(initialReviews.filter((r: Review) => r.source === 'google'))
+    }
+  }, [initialReviews])
 
   const fetchGoogleReviews = (localsList: Review[]) => {
     setIsSyncing(true)
@@ -98,9 +74,11 @@ export default function ReviewsClient() {
           setGoogleReviews(data.reviews)
           setGoogleStats({
             rating: data.rating?.toString() || '4.9',
-            totalCount: data.totalReviewsCount || 124
+            totalCount: data.totalReviewsCount || 129
           })
-          const combined = [...localsList, ...data.reviews]
+          const combined = [...localsList, ...data.reviews].sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
           localStorage.setItem('shambhuji_reviews_combined', JSON.stringify(combined))
           setReviews(combined)
           setLastSynced(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))
@@ -111,7 +89,9 @@ export default function ReviewsClient() {
       .catch(err => {
         console.error('Error syncing Google reviews:', err)
         // Fallback merge
-        const combined = [...localsList]
+        const combined = [...localsList].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        )
         setReviews(combined)
       })
       .finally(() => {
@@ -368,7 +348,7 @@ export default function ReviewsClient() {
                             {r.source === 'google' && (
                               <span className="inline-flex items-center bg-blue-50 text-[10px] text-blue-600 px-2 py-0.5 rounded-full font-bold border border-blue-100 gap-1 select-none">
                                 <GoogleIcon className="w-3 h-3" />
-                                <span>Verified</span>
+                                <span>Google Verified User</span>
                               </span>
                             )}
                           </div>
@@ -422,7 +402,7 @@ export default function ReviewsClient() {
 
               <div className="pt-2">
                 <a
-                  href="https://share.google/f1Tt4tXvgFDLTzwnO"
+                  href="https://share.google/eGPo3kazjTMUh8jNy"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex w-full items-center justify-center space-x-2.5 bg-accent hover:bg-green-600 text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] duration-150 cursor-pointer"

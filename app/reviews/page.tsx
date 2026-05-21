@@ -3,6 +3,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ReviewsClient from '@/components/ReviewsClient'
 import { BreadcrumbJsonLd } from '@/components/JsonLd'
+import { getCombinedReviews } from '@/lib/reviews'
 
 export const metadata: Metadata = {
   title: 'Customer Reviews & About Us | Shambhu ji Travels',
@@ -17,7 +18,9 @@ export const metadata: Metadata = {
   },
 }
 
-export default function ReviewsPage() {
+export default async function ReviewsPage() {
+  const reviewsData = await getCombinedReviews()
+
   return (
     <>
       <BreadcrumbJsonLd
@@ -29,7 +32,11 @@ export default function ReviewsPage() {
       <Header />
       <main className="bg-gray-50/50 min-h-screen py-12">
         <div className="container mx-auto px-4">
-          <ReviewsClient />
+          <ReviewsClient 
+            initialReviews={reviewsData.reviews}
+            initialGoogleRating={reviewsData.rating}
+            initialGoogleReviewsCount={reviewsData.totalReviewsCount}
+          />
         </div>
       </main>
       <Footer />
