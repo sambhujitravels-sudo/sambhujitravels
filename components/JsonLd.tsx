@@ -6,7 +6,10 @@ export function JsonLd() {
     name: 'Shambhu ji Travels',
     description: 'Reliable taxi and cab service in Bareilly offering one-way, round trip, and airport transfers across North India.',
     url: 'https://sambhujitravels.in',
-    logo: 'https://sambhujitravels.in/logo.png',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://sambhujitravels.in/logo.png',
+    },
     telephone: '+918077230221',
     email: 'sambhujitravels@gmail.com',
     priceRange: '₹₹',
@@ -22,8 +25,8 @@ export function JsonLd() {
     },
     areaServed: [
       { '@type': 'City', name: 'Bareilly' },
-      { '@type': 'State', name: 'Uttar Pradesh' },
-      { '@type': 'State', name: 'Uttarakhand' },
+      { '@type': 'AdministrativeArea', name: 'Uttar Pradesh' },
+      { '@type': 'AdministrativeArea', name: 'Uttarakhand' },
       { '@type': 'City', name: 'Delhi' },
     ],
     geo: {
@@ -38,12 +41,14 @@ export function JsonLd() {
       bestRating: '5',
       worstRating: '1'
     },
-    openingHoursSpecification: {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-      opens: '00:00',
-      closes: '23:59',
-    },
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        opens: '00:00',
+        closes: '23:59',
+      }
+    ],
     sameAs: [],
     image: 'https://sambhujitravels.in/og-image.jpg',
   }
@@ -57,7 +62,10 @@ export function JsonLd() {
       '@type': 'LocalBusiness',
       name: 'Shambhu ji Travels',
       telephone: '+918077230221',
-      logo: 'https://sambhujitravels.in/logo.png',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://sambhujitravels.in/logo.png',
+      },
       address: {
         '@type': 'PostalAddress',
         streetAddress: '123, Main Market, Civil Lines',
@@ -73,7 +81,7 @@ export function JsonLd() {
       reviewCount: '129'
     },
     areaServed: {
-      '@type': 'State',
+      '@type': 'AdministrativeArea',
       name: 'Uttar Pradesh',
     },
     serviceType: 'Taxi Service',
