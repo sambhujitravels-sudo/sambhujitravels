@@ -34,13 +34,7 @@ export function JsonLd() {
       latitude: '28.3670',
       longitude: '79.4304',
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: '129',
-      bestRating: '5',
-      worstRating: '1'
-    },
+
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
@@ -53,75 +47,11 @@ export function JsonLd() {
     image: 'https://sambhujitravels.in/og-image.jpg',
   }
 
-  const taxiServiceSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'TaxiService',
-    name: 'Shambhu ji Travels - Taxi Service',
-    description: 'Book outstation cabs, one-way taxis, and airport transfers from Bareilly at affordable rates starting ₹11/km.',
-    provider: {
-      '@type': 'LocalBusiness',
-      name: 'Shambhu ji Travels',
-      telephone: '+918077230221',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://sambhujitravels.in/logo.png',
-      },
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: '123, Main Market, Civil Lines',
-        addressLocality: 'Bareilly',
-        addressRegion: 'Uttar Pradesh',
-        postalCode: '243001',
-        addressCountry: 'IN'
-      }
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: '129'
-    },
-    areaServed: {
-      '@type': 'AdministrativeArea',
-      name: 'Uttar Pradesh',
-    },
-    serviceType: 'Taxi Service',
-    offers: [
-      {
-        '@type': 'Offer',
-        name: 'Sedan Cab',
-        description: 'Swift Dzire or similar sedan for comfortable travel',
-        price: '11',
-        priceCurrency: 'INR',
-        unitText: 'per kilometer',
-      },
-      {
-        '@type': 'Offer',
-        name: 'SUV Cab',
-        description: 'Ertiga or similar SUV for family travel',
-        price: '13',
-        priceCurrency: 'INR',
-        unitText: 'per kilometer',
-      },
-      {
-        '@type': 'Offer',
-        name: 'Innova Crysta',
-        description: 'Premium Innova Crysta for luxury travel',
-        price: '18',
-        priceCurrency: 'INR',
-        unitText: 'per kilometer',
-      },
-    ],
-  }
-
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(taxiServiceSchema) }}
       />
     </>
   )
