@@ -115,10 +115,10 @@ export default function Testimonials({ initialReviews }: { initialReviews?: Revi
             </div>
             <div className="text-right border-l border-gray-700/60 pl-6 shrink-0">
               <div className="flex items-center justify-end text-yellow-400 font-extrabold text-lg gap-1">
-                <span>4.9</span>
+                <span>5.0</span>
                 <span className="flex text-sm">{'★'.repeat(5)}</span>
               </div>
-              <p className="text-xs text-gray-400 mt-0.5">129+ Verified Reviews</p>
+              <p className="text-xs text-gray-400 mt-0.5">14+ Verified Reviews</p>
               <a 
                 href="https://maps.google.com/?cid=12643566589326466986"
                 target="_blank" 

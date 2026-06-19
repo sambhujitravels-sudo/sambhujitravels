@@ -16,6 +16,15 @@ const popularRoutes = [
   { from: 'Lucknow', to: 'Bareilly' },
 ]
 
+// High-intent landing pages — keep internally linked so they stay crawlable
+const bareillyServices = [
+  { href: '/taxi-service-in-bareilly', label: 'Taxi Service in Bareilly' },
+  { href: '/cab-service-in-bareilly', label: 'Cab Service in Bareilly' },
+  { href: '/one-way-taxi-bareilly', label: 'One-Way Taxi from Bareilly' },
+  { href: '/bareilly-airport-taxi', label: 'Bareilly Airport Taxi' },
+  { href: '/bareilly-railway-station-cab', label: 'Bareilly Railway Station Cab' },
+]
+
 export default function Footer() {
   const pathname = usePathname()
 
@@ -93,6 +102,22 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+
+        {/* Popular Services in Bareilly */}
+        <div className="border-t border-gray-800 pt-8 mb-8">
+          <h4 className="text-white font-bold mb-4">Popular Taxi Services in Bareilly</h4>
+          <div className="flex flex-wrap gap-2">
+            {bareillyServices.map((service) => (
+              <Link
+                key={service.href}
+                href={service.href}
+                className="text-sm bg-gray-800 hover:bg-gray-700 hover:text-accent text-gray-300 px-3 py-1.5 rounded-full transition-colors"
+              >
+                {service.label}
+              </Link>
+            ))}
           </div>
         </div>
 

@@ -79,12 +79,12 @@ export default function Hero() {
               </div>
               <div>
                 <div className="flex items-center text-accent text-sm font-bold">
-                  <span>4.9/5 Rating</span>
+                  <span>5.0/5 Rating</span>
                   <span className="ml-1.5 flex text-yellow-400">
                     {'★'.repeat(5)}
                   </span>
                 </div>
-                <p className="text-xs text-blue-200 font-medium">Based on 129+ Google Reviews</p>
+                <p className="text-xs text-blue-200 font-medium">Based on 14+ Google Reviews</p>
               </div>
             </div>
 
