@@ -119,10 +119,10 @@ export default function Testimonials({ initialReviews }: { initialReviews?: Revi
                 <span className="flex text-sm">{'★'.repeat(5)}</span>
               </div>
               <p className="text-xs text-gray-400 mt-0.5">14+ Verified Reviews</p>
-              <a 
-                href="https://maps.google.com/?cid=12643566589326466986"
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href="https://share.google/RIDoRBmSpq1aC6vRs"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-block text-[11px] text-accent font-bold hover:underline mt-1"
               >
                 Verify on Google Maps →
