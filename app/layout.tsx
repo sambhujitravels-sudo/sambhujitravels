@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { JsonLd } from '@/components/JsonLd'
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://sambhujitravels.in'),
@@ -75,6 +76,7 @@ export default function RootLayout({
         <WhatsAppButton />
         <MobileStickyCTA />
       </body>
+      <GoogleAnalytics gaId="G-3L50DQF3H8" />
     </html>
   )
 }
