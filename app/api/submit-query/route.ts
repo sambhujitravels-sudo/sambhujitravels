@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
+import { supabaseAdmin } from '@/lib/supabase'
 
-export interface BookingQuery {
+export type BookingQuery = {
   id: string
   name: string
   mobile: string
@@ -17,108 +16,111 @@ export interface BookingQuery {
   page?: string
 }
 
-const DATA_FILE = path.join(process.cwd(), 'data', 'queries.json')
-
-async function ensureDataFile() {
-  const dir = path.join(process.cwd(), 'data')
-  try {
-    await fs.access(dir)
-  } catch {
-    await fs.mkdir(dir, { recursive: true })
-  }
-  try {
-    await fs.access(DATA_FILE)
-  } catch {
-    await fs.writeFile(DATA_FILE, JSON.stringify([]), 'utf-8')
-  }
-}
-
-async function readQueries(): Promise<BookingQuery[]> {
-  await ensureDataFile()
-  try {
-    const content = await fs.readFile(DATA_FILE, 'utf-8')
-    return JSON.parse(content)
-  } catch {
-    return []
+function toRow(q: Omit<BookingQuery, 'id' | 'submittedAt'>) {
+  return {
+    name: q.name,
+    mobile: q.mobile,
+    pickup_city: q.pickupCity,
+    drop_city: q.dropCity,
+    pickup_date: q.pickupDate,
+    pickup_time: q.pickupTime,
+    vehicle_type: q.vehicleType,
+    trip_type: q.tripType,
+    status: 'new' as const,
+    page: q.page || 'website',
   }
 }
 
-async function writeQueries(queries: BookingQuery[]) {
-  await ensureDataFile()
-  await fs.writeFile(DATA_FILE, JSON.stringify(queries, null, 2), 'utf-8')
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function fromRow(r: any): BookingQuery {
+  return {
+    id: r.id,
+    name: r.name,
+    mobile: r.mobile,
+    pickupCity: r.pickup_city,
+    dropCity: r.drop_city,
+    pickupDate: r.pickup_date,
+    pickupTime: r.pickup_time,
+    vehicleType: r.vehicle_type,
+    tripType: r.trip_type,
+    status: r.status,
+    submittedAt: r.submitted_at,
+    page: r.page,
+  }
 }
 
-// POST /api/submit-query — Save a new booking query
+function checkAdmin(req: NextRequest): boolean {
+  const pwd = new URL(req.url).searchParams.get('pwd')
+  const adminPwd = process.env.ADMIN_PASSWORD || 'shambhuji2025'
+  return pwd === adminPwd
+}
+
+// ─── POST /api/submit-query ── Save a new booking enquiry ───────────────────
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { name, mobile, pickupCity, dropCity, pickupDate, pickupTime, vehicleType, tripType, page } = body
 
-    if (!mobile || !pickupCity || !dropCity) {
+    if (!body.mobile || !body.pickupCity || !body.dropCity) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const queries = await readQueries()
+    const id = `Q${Date.now()}`
 
-    const newQuery: BookingQuery = {
-      id: `Q${Date.now()}`,
-      name: name || 'Unknown',
-      mobile,
-      pickupCity,
-      dropCity,
-      pickupDate: pickupDate || '',
-      pickupTime: pickupTime || '',
-      vehicleType: vehicleType || 'Sedan',
-      tripType: tripType || 'oneway',
-      status: 'new',
-      submittedAt: new Date().toISOString(),
-      page: page || 'website',
+    const { error } = await supabaseAdmin.from('booking_queries').insert({
+      id,
+      ...toRow(body),
+    })
+
+    if (error) {
+      console.error('Supabase insert error:', error)
+      return NextResponse.json({ error: 'Failed to save query' }, { status: 500 })
     }
 
-    queries.unshift(newQuery) // newest first
-    await writeQueries(queries)
-
-    return NextResponse.json({ success: true, id: newQuery.id })
-  } catch (error) {
-    console.error('Failed to save query:', error)
+    return NextResponse.json({ success: true, id })
+  } catch (err) {
+    console.error('POST /api/submit-query error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-// GET /api/submit-query — Fetch all queries (used by admin dashboard)
+// ─── GET /api/submit-query ── Admin: fetch all queries ──────────────────────
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const pwd = searchParams.get('pwd')
-
-  // Simple password gate
-  const adminPwd = process.env.ADMIN_PASSWORD || 'shambhuji2025'
-  if (pwd !== adminPwd) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!checkAdmin(req)) {
+    return NextResponse.json({ error: 'Wrong password' }, { status: 401 })
   }
 
-  const queries = await readQueries()
+  const { data, error } = await supabaseAdmin
+    .from('booking_queries')
+    .select('*')
+    .order('submitted_at', { ascending: false })
+
+  if (error) {
+    console.error('Supabase fetch error:', error)
+    return NextResponse.json({ error: 'Failed to fetch queries' }, { status: 500 })
+  }
+
+  const queries = (data || []).map(fromRow)
   return NextResponse.json({ queries, total: queries.length })
 }
 
-// PATCH /api/submit-query — Update query status
+// ─── PATCH /api/submit-query ── Admin: update query status ──────────────────
 export async function PATCH(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const pwd = searchParams.get('pwd')
-  const adminPwd = process.env.ADMIN_PASSWORD || 'shambhuji2025'
-
-  if (pwd !== adminPwd) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!checkAdmin(req)) {
+    return NextResponse.json({ error: 'Wrong password' }, { status: 401 })
   }
 
   try {
     const { id, status } = await req.json()
-    const queries = await readQueries()
-    const idx = queries.findIndex(q => q.id === id)
-    if (idx === -1) {
-      return NextResponse.json({ error: 'Query not found' }, { status: 404 })
+
+    const { error } = await supabaseAdmin
+      .from('booking_queries')
+      .update({ status })
+      .eq('id', id)
+
+    if (error) {
+      return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
     }
-    queries[idx].status = status
-    await writeQueries(queries)
+
     return NextResponse.json({ success: true })
   } catch {
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
