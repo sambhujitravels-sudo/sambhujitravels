@@ -33,7 +33,7 @@ export default function ReviewsClient({
   const [ratingFilter, setRatingFilter] = useState<number | null>(null)
   const [googleStats, setGoogleStats] = useState({
     rating: initialGoogleRating?.toString() || '5.0',
-    totalCount: initialGoogleReviewsCount || 14
+    totalCount: initialGoogleReviewsCount || 54
   })
   const [isSyncing, setIsSyncing] = useState(false)
   const [lastSynced, setLastSynced] = useState<string>('')
@@ -74,7 +74,7 @@ export default function ReviewsClient({
           setGoogleReviews(data.reviews)
           setGoogleStats({
             rating: data.rating?.toString() || '5.0',
-            totalCount: data.totalReviewsCount || 14
+            totalCount: data.totalReviewsCount || 54
           })
           const combined = [...localsList, ...data.reviews].sort(
             (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()

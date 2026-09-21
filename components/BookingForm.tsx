@@ -23,9 +23,26 @@ export default function BookingForm() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+
+    // Save query to dashboard (fire-and-forget — never blocks WhatsApp)
+    fetch('/api/submit-query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Website Visitor',
+        mobile: formData.mobile,
+        pickupCity: formData.pickupCity,
+        dropCity: formData.dropCity,
+        pickupDate: formData.pickupDate,
+        pickupTime: formData.pickupTime,
+        vehicleType,
+        tripType,
+        page: typeof window !== 'undefined' ? window.location.pathname : 'website',
+      }),
+    }).catch(() => {/* silent fail */})
 
     const message = `Hello, I want to book a cab.%0A%0A*Trip Type:* ${tripType === 'oneway' ? 'One Way' : 'Round Trip'}%0A*Vehicle Type:* ${vehicleType}%0A*Pickup City:* ${formData.pickupCity}%0A*Drop City:* ${formData.dropCity}%0A*Date:* ${formData.pickupDate}%0A*Time:* ${formData.pickupTime}%0A*Mobile:* ${formData.mobile}`
 

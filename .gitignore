@@ -43,3 +43,6 @@ coverage/
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Booking queries data (customer data — keep local, don't commit)
+data/queries.json

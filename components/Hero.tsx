@@ -84,7 +84,7 @@ export default function Hero() {
                     {'★'.repeat(5)}
                   </span>
                 </div>
-                <p className="text-xs text-blue-200 font-medium">Based on 14+ Google Reviews</p>
+                <p className="text-xs text-blue-200 font-medium">Based on 54+ Google Reviews</p>
               </div>
             </div>
 

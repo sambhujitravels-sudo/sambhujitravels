@@ -12,8 +12,8 @@ import {
   Compass, AlertTriangle, Fuel, Info, CalendarCheck 
 } from 'lucide-react'
 
-// Allow dynamic routes not in generateStaticParams
-export const dynamicParams = true
+// Only serve pre-defined routes; unknown slugs → proper HTTP 404 (no noindex confusion)
+export const dynamicParams = false
 
 type Params = Promise<{ route: string }>
 
@@ -29,7 +29,10 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const parsed = parseRoute(resolvedParams?.route || '')
 
   if (!parsed) {
-    return { title: 'Route Not Found' }
+    return {
+      title: 'Route Not Found',
+      robots: { index: false, follow: false },
+    }
   }
 
   const { from, to } = parsed
@@ -48,6 +51,16 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       title: `${fromCity} to ${toCity} Taxi | Shambhu ji Travels`,
       description: `Premium one-way & round trip taxi service from ${fromCity} to ${toCity}. Sedan, SUV & Innova Crysta.`,
       url: `https://sambhujitravels.in/${from}-to-${to}-cab`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-snippet': -1,
+        'max-image-preview': 'large',
+      },
     },
   }
 }

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 const faqs = [
   {
     question: 'Why is Shambhu Ji Travels considered the best cab service in Bareilly?',
-    answer: 'We provide RTO-registered commercial vehicles, police-verified professional chauffeurs, completely transparent per-kilometer pricing, and have a 5.0/5 star rating on Google based on 14+ reviews.',
+    answer: 'We provide RTO-registered commercial vehicles, police-verified professional chauffeurs, completely transparent per-kilometer pricing, and have a 5.0/5 star rating on Google based on 54+ reviews.',
   },
   {
     question: 'Is advance payment required to book a cab?',
@@ -130,7 +130,7 @@ export default function BestCabServiceInBareilly() {
                       </li>
                       <li className="flex justify-between">
                         <span className="text-gray-500">Reviews Count</span>
-                        <span className="font-medium">14+ Verified</span>
+                        <span className="font-medium">54+ Verified</span>
                       </li>
                       <li className="flex justify-between">
                         <span className="text-gray-500">Since</span>

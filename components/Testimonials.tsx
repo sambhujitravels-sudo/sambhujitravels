@@ -118,7 +118,7 @@ export default function Testimonials({ initialReviews }: { initialReviews?: Revi
                 <span>5.0</span>
                 <span className="flex text-sm">{'★'.repeat(5)}</span>
               </div>
-              <p className="text-xs text-gray-400 mt-0.5">14+ Verified Reviews</p>
+              <p className="text-xs text-gray-400 mt-0.5">54+ Verified Reviews</p>
               <a
                 href="https://share.google/RIDoRBmSpq1aC6vRs"
                 target="_blank"

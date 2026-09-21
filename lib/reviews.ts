@@ -153,7 +153,7 @@ export async function getGoogleReviews(): Promise<ReviewsResponse> {
     return {
       reviews: SEEDED_GOOGLE_REVIEWS,
       source: 'fallback',
-      totalReviewsCount: 14,
+      totalReviewsCount: 54,
       rating: 5.0
     }
   }
@@ -168,7 +168,7 @@ export async function getGoogleReviews(): Promise<ReviewsResponse> {
       return {
         reviews: SEEDED_GOOGLE_REVIEWS,
         source: 'fallback_error',
-        totalReviewsCount: 14,
+        totalReviewsCount: 54,
         rating: 5.0
       }
     }
@@ -191,7 +191,7 @@ export async function getGoogleReviews(): Promise<ReviewsResponse> {
     return {
       reviews: googleReviews.length > 0 ? googleReviews : SEEDED_GOOGLE_REVIEWS,
       source: 'google_places_api',
-      totalReviewsCount: data.result.user_ratings_total || 14,
+      totalReviewsCount: data.result.user_ratings_total || 54,
       rating: data.result.rating || 5.0
     }
   } catch (error) {
@@ -199,7 +199,7 @@ export async function getGoogleReviews(): Promise<ReviewsResponse> {
     return {
       reviews: SEEDED_GOOGLE_REVIEWS,
       source: 'fallback_exception',
-      totalReviewsCount: 14,
+      totalReviewsCount: 54,
       rating: 5.0
     }
   }
